@@ -4,6 +4,8 @@ let nSeeds = 2;
 let probGrow = 0.5;
 // Probability of vine growing a certain direction: [top left, top middle, top right]. Must sum to 1
 let probDir = [0.25, 0.5, 0.25];
+// Probability that a growing vine will branch
+let probBranch = 0.05;
 // Array containing coordinates [row, col] of vine fronts (nodes) on canvas
 let growNodes = [];
 let fps = 5;
@@ -71,7 +73,7 @@ function draw() {
     rect(res * node[1], res * node[0], res, res);
     // Grow
     // -------------------------------------------------------------------------
-    isGrowing = Math.random() < probGrow;
+    let isGrowing = Math.random() < probGrow;
     if (isGrowing) {
       let probVal = Math.random();
       let growDir;
@@ -85,10 +87,15 @@ function draw() {
       else {
         growDir = 1;
       }
-      console.log(`growDir: ${growDir}`);
-      console.log(growNodes[i])
       growNodes.splice(i, 1, [node[0] - 1, node[1] + growDir]);
-      console.log(growNodes[i]);
+      let isBranching = Math.random() < probBranch;
+      function getBranch() {
+        let dirs = [-1, 0, 1];
+        branchDir = dirs[Math.floor(3 * Math.random())];
+      }
+      if (isBranching) {
+
+      }
     }
   }
   // if save is true, save frames
