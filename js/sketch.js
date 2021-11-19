@@ -59,6 +59,9 @@ function keyPressed() {
       console.log('RESUMED. Press SPACE to stop.')
     }
   }
+  if (key === 'r') {
+    reset();
+  }
 }
 
 function draw() {
