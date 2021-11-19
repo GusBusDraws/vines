@@ -1,11 +1,13 @@
 let preset = 'square';
-let nSeeds = 2;
+let nSeeds = 3;
 // Probability of a vine growing in a frame
 let probGrow = 0.5;
 // Probability of vine growing a certain direction: [top left, top middle, top right]. Must sum to 1
 let probDir = [0.25, 0.5, 0.25];
 // Probability that a growing vine will branch
 let probBranch = 0.03;
+// Probability of a growing vine to stop growing
+let probStop = 0.01;
 // Array containing coordinates [row, col] of vine fronts (nodes) on canvas
 let growNodes = [];
 let fps = 5;
@@ -74,13 +76,19 @@ function draw() {
     noStroke();
     fill.apply(null, vineColor);
     rect(res * node[1], res * node[0], res, res);
+    // Check if node should stop growing
+    // -------------------------------------------------------------------------
+    let isStopping = Math.random() < probStop;
+    if (isStopping) {
+      console.log(`Node stopping at ${{node}}`);
+      growNodes.splice(i, 1);
+    }
     // Grow
     // -------------------------------------------------------------------------
     let isGrowing = Math.random() < probGrow;
     if (isGrowing) {
       let probVal = Math.random();
       let growDir;
-      console.log(`probVal: ${probVal}`);
       switch (true) {
         case (probVal < probDir[0]):
           growDir = -1;
@@ -96,6 +104,7 @@ function draw() {
       // -----------------------------------------------------------------------
       let isBranching = Math.random() < probBranch;
       if (isBranching) {
+        console.log(`Node branching at ${{node}}`);
         // dirs will be possible direction to branch
         let dirs = [-1, 0, 1];
         // Remove the direction the previous node grew in (growDir) from the available options of the branch
