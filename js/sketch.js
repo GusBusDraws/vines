@@ -81,23 +81,21 @@ function draw() {
       let probVal = Math.random();
       let growDir;
       console.log(`probVal: ${probVal}`);
-      if (probVal < probDir[0]) {
-        growDir = -1;
-      }
-      else if (probDir[0] <= probVal && probVal < probDir[0] + probDir[1]) {
-        growDir = 0;
-      }
-      else {
-        growDir = 1;
+      switch (true) {
+        case (probVal < probDir[0]):
+          growDir = -1;
+          break;
+        case (probDir[0] <= probVal && probVal < probDir[0] + probDir[1]):
+          growDir = 0;
+          break;
+        default:
+          growDir = 1;
       }
       growNodes.splice(i, 1, [node[0] - 1, node[1] + growDir]);
       let isBranching = Math.random() < probBranch;
       function getBranch() {
         let dirs = [-1, 0, 1];
         branchDir = dirs[Math.floor(3 * Math.random())];
-      }
-      if (isBranching) {
-
       }
     }
   }
