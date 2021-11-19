@@ -1,9 +1,13 @@
 let preset = 'square';
-let nSeeds = 2;
+let nSeeds = 3;
 // Probability of a vine growing in a frame
 let probGrow = 0.5;
 // Probability of vine growing a certain direction: [top left, top middle, top right]. Must sum to 1
 let probDir = [0.25, 0.5, 0.25];
+// Probability that a growing vine will branch
+let probBranch = 0.03;
+// Probability of a growing vine to stop growing
+let probStop = 0.01;
 // Array containing coordinates [row, col] of vine fronts (nodes) on canvas
 let growNodes = [];
 let fps = 5;
@@ -57,6 +61,9 @@ function keyPressed() {
       console.log('RESUMED. Press SPACE to stop.')
     }
   }
+  if (key === 'r') {
+    reset();
+  }
 }
 
 function draw() {
@@ -69,26 +76,44 @@ function draw() {
     noStroke();
     fill.apply(null, vineColor);
     rect(res * node[1], res * node[0], res, res);
+    // Check if node should stop growing
+    // -------------------------------------------------------------------------
+    let isStopping = Math.random() < probStop;
+    if (isStopping) {
+      console.log(`Node stopping at ${{node}}`);
+      growNodes.splice(i, 1);
+    }
     // Grow
     // -------------------------------------------------------------------------
-    isGrowing = Math.random() < probGrow;
+    let isGrowing = Math.random() < probGrow;
     if (isGrowing) {
       let probVal = Math.random();
       let growDir;
-      console.log(`probVal: ${probVal}`);
-      if (probVal < probDir[0]) {
-        growDir = -1;
+      switch (true) {
+        case (probVal < probDir[0]):
+          growDir = -1;
+          break;
+        case (probDir[0] <= probVal && probVal < probDir[0] + probDir[1]):
+          growDir = 0;
+          break;
+        default:
+          growDir = 1;
       }
-      else if (probDir[0] <= probVal && probVal < probDir[0] + probDir[1]) {
-        growDir = 0;
-      }
-      else {
-        growDir = 1;
-      }
-      console.log(`growDir: ${growDir}`);
-      console.log(growNodes[i])
       growNodes.splice(i, 1, [node[0] - 1, node[1] + growDir]);
-      console.log(growNodes[i]);
+      // Branching
+      // -----------------------------------------------------------------------
+      let isBranching = Math.random() < probBranch;
+      if (isBranching) {
+        console.log(`Node branching at ${{node}}`);
+        // dirs will be possible direction to branch
+        let dirs = [-1, 0, 1];
+        // Remove the direction the previous node grew in (growDir) from the available options of the branch
+        let growDirIdx = dirs.indexOf(growDir);
+        dirs.splice(growDirIdx, 1);
+        // Pick one of the available growing directions (dirs) at random
+        branchDir = dirs[Math.floor(2 * Math.random())];
+        growNodes.push([node[0] - 1, node[1] + branchDir]);
+      }
     }
   }
   // if save is true, save frames
